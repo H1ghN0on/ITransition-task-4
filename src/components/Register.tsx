@@ -10,6 +10,8 @@ import {
 } from "../styles/components";
 import { AuthFragment } from "../pages/Auth";
 import Axios from "../config/axios";
+import Cookies from "js-cookie";
+import { Navigate } from "react-router-dom";
 
 type InputRegisterType = {
   username: string;
@@ -18,7 +20,7 @@ type InputRegisterType = {
   confirmPassword: string;
 };
 
-const Register: React.FC<AuthFragment> = ({ handleFooterClick }) => {
+const Register: React.FC<AuthFragment> = ({ handleFooterClick, redirect }) => {
   const [error, setError] = React.useState<string>("");
   const [inputValues, setInputValues] = React.useState<InputRegisterType>({
     username: "1",
@@ -31,6 +33,28 @@ const Register: React.FC<AuthFragment> = ({ handleFooterClick }) => {
     setInputValues({ ...inputValues, [e.target.name]: e.target.value });
   };
 
+  const register = async (requestData: {
+    username: string;
+    password: string;
+    email: string;
+  }) => {
+    try {
+      const { data } = await Axios.post("/register", requestData);
+      if (data.status === "Error") {
+        setError(data.message);
+      } else {
+        if (data.user.token) {
+          redirect(
+            { username: data.user.username, email: data.user.email },
+            data.user.token
+          );
+        }
+      }
+    } catch (error) {
+      setError("Something gone wrong");
+    }
+  };
+
   const handleSubmitClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (validateValues()) {
@@ -40,15 +64,7 @@ const Register: React.FC<AuthFragment> = ({ handleFooterClick }) => {
         password: inputValues.password,
         email: inputValues.email,
       };
-      try {
-        const { data } = await Axios.post("/register", requestData);
-        if (data.status === "Error") {
-          setError(data.message);
-        } else {
-        }
-      } catch (error) {
-        setError("Something gone wrong");
-      }
+      await register(requestData);
     }
   };
 

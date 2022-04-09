@@ -1,8 +1,9 @@
 import express from "express";
-
+import generateJWT from "../utils/generateJWT";
+import { IUserRequest } from "../types";
 const { User } = require("../../models");
 
-type UserData = {
+export type UserData = {
   username: string;
   password: string;
   email: string;
@@ -51,7 +52,11 @@ const addUserToDatabase = async (
   userData: UserData
 ): Promise<Status | UserData> => {
   try {
-    return await User.create(userData);
+    const dbUser = await User.create(userData);
+    const user = Object.assign(dbUser.dataValues, {
+      token: generateJWT(dbUser),
+    });
+    return user;
   } catch (error) {
     return {
       status: "Error",
@@ -61,6 +66,10 @@ const addUserToDatabase = async (
 };
 
 class AuthController {
+  getMe(req: express.Request, res: express.Response) {
+    res.json(req.user);
+  }
+
   async register(req: express.Request, res: express.Response) {
     const userData = req.body;
     const validation = await validateUnique(userData);
@@ -69,6 +78,23 @@ class AuthController {
       res.send(registerStatus);
     } else {
       res.send(validation);
+    }
+  }
+
+  async loginForPassport(login_username: string, login_password: string, done) {
+    let dbUser = await User.findOne({
+      where: {
+        username: login_username,
+        password: login_password,
+      },
+    });
+    if (dbUser) {
+      const user = Object.assign(dbUser.dataValues, {
+        token: generateJWT(dbUser),
+      });
+      return done(null, { user, status: "OK", message: "" });
+    } else {
+      return done(null, { status: "Error", message: "Unknown user" });
     }
   }
 }

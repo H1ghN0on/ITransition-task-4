@@ -29,18 +29,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.post("/login", (req, res, next) => {
-  passport.authenticate("local", function (err, user) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.send("Укажите правильный email или пароль!");
-    }
-  })(req, res, next);
-});
+app.post("/login", passport.authenticate("local"), AuthController.getMe);
 
 app.post("/register", AuthController.register);
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });

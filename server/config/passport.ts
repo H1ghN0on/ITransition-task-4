@@ -1,11 +1,19 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import AuthController from "../controllers/AuthController";
 
-const userDB = {
-  id: 136345,
-  username: "H1ghN0on_",
-  password: "123",
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET_KEY,
 };
+passport.use(
+  new JwtStrategy(opts, (jwt_payload, done) => {
+    done(null, jwt_payload);
+  })
+);
+
+passport.use(new LocalStrategy(AuthController.loginForPassport));
 
 passport.serializeUser(function (user, cb) {
   process.nextTick(function () {
@@ -18,15 +26,5 @@ passport.deserializeUser(function (user, cb) {
     return cb(null, user);
   });
 });
-
-passport.use(
-  new LocalStrategy(function (username, password, done) {
-    if (username === userDB.username && password === userDB.password) {
-      return done(null, userDB);
-    } else {
-      return done(null, false);
-    }
-  })
-);
 
 export { passport };
