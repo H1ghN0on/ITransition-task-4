@@ -11,7 +11,23 @@ export type UserData = {
 
 type Status = {
   status: "OK" | "Error";
+  user?: UserData;
   message: string;
+};
+
+const generateCurrentDate = () => {
+  const today = new Date();
+  const date =
+    String(today.getDate()).padStart(2, "0") +
+    "/" +
+    String(today.getMonth() + 1).padStart(2, "0") +
+    "/" +
+    today.getFullYear();
+  const time =
+    String(today.getHours()).padStart(2, "0") +
+    ":" +
+    String(today.getMinutes()).padStart(2, "0");
+  return date + " " + time;
 };
 
 const checkEmailUnique = async (userEmail: string) => {
@@ -48,15 +64,21 @@ const validateUnique = async (userData: UserData): Promise<Status> => {
   return { status: "OK", message: "" };
 };
 
-const addUserToDatabase = async (
-  userData: UserData
-): Promise<Status | UserData> => {
+const addUserToDatabase = async (userData: UserData): Promise<Status> => {
   try {
     const dbUser = await User.create(userData);
     const user = Object.assign(dbUser.dataValues, {
       token: generateJWT(dbUser),
     });
-    return user;
+    await dbUser.update({
+      loginDate: generateCurrentDate(),
+    });
+    await dbUser.save();
+    return {
+      status: "OK",
+      user,
+      message: "",
+    };
   } catch (error) {
     return {
       status: "Error",
@@ -89,6 +111,10 @@ class AuthController {
       },
     });
     if (dbUser) {
+      await dbUser.update({
+        loginDate: generateCurrentDate(),
+      });
+      await dbUser.save();
       const user = Object.assign(dbUser.dataValues, {
         token: generateJWT(dbUser),
       });

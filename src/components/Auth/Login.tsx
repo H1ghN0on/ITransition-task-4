@@ -7,11 +7,9 @@ import {
   RegisterSpan,
   RegisterLink,
   Error,
-} from "../styles/components";
-import { AuthFragment } from "../pages/Auth";
-import Axios from "../config/axios";
-import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+} from "../../styles/components";
+import { AuthFragment } from "../../pages/Auth";
+import Axios from "../../config/axios";
 
 type InputLoginType = {
   username: string;
@@ -19,8 +17,6 @@ type InputLoginType = {
 };
 
 const Login: React.FC<AuthFragment> = ({ handleFooterClick, redirect }) => {
-  const navigate = useNavigate();
-
   const [error, setError] = React.useState<string>("");
   const [inputValues, setInputValues] = React.useState<InputLoginType>({
     username: "",
@@ -29,11 +25,13 @@ const Login: React.FC<AuthFragment> = ({ handleFooterClick, redirect }) => {
 
   const login = async (requestData: InputLoginType) => {
     try {
-      const { data } = await Axios.post("/login", requestData);
+      const { data } = await Axios().post("/login", requestData);
       if (data.status === "Error") {
         setError(data.message);
       } else {
-        if (data.user.token) {
+        if (data.user.status === true) {
+          setError("Your account is blocked");
+        } else if (data.user.token) {
           redirect(
             { username: data.user.username, email: data.user.email },
             data.user.token

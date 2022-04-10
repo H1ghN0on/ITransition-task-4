@@ -7,11 +7,9 @@ import {
   RegisterSpan,
   RegisterLink,
   Error,
-} from "../styles/components";
-import { AuthFragment } from "../pages/Auth";
-import Axios from "../config/axios";
-import Cookies from "js-cookie";
-import { Navigate } from "react-router-dom";
+} from "../../styles/components";
+import { AuthFragment } from "../../pages/Auth";
+import Axios from "../../config/axios";
 
 type InputRegisterType = {
   username: string;
@@ -23,10 +21,10 @@ type InputRegisterType = {
 const Register: React.FC<AuthFragment> = ({ handleFooterClick, redirect }) => {
   const [error, setError] = React.useState<string>("");
   const [inputValues, setInputValues] = React.useState<InputRegisterType>({
-    username: "1",
-    password: "1",
-    email: "mem@ma.ru",
-    confirmPassword: "1",
+    username: "",
+    password: "",
+    email: "",
+    confirmPassword: "",
   });
 
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +37,7 @@ const Register: React.FC<AuthFragment> = ({ handleFooterClick, redirect }) => {
     email: string;
   }) => {
     try {
-      const { data } = await Axios.post("/register", requestData);
+      const { data } = await Axios().post("/register", requestData);
       if (data.status === "Error") {
         setError(data.message);
       } else {
@@ -51,6 +49,7 @@ const Register: React.FC<AuthFragment> = ({ handleFooterClick, redirect }) => {
         }
       }
     } catch (error) {
+      console.log(error);
       setError("Something gone wrong");
     }
   };

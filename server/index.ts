@@ -8,6 +8,7 @@ import "./config/db";
 import { passport } from "./config/passport";
 import cors from "cors";
 import AuthController from "./controllers/AuthController";
+import UserController from "./controllers/UserController";
 
 const app = express();
 const PORT = 3001;
@@ -29,9 +30,19 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+app.get("/me", passport.authenticate("jwt"), UserController.getMe);
+
+app.get("/users", passport.authenticate("jwt"), UserController.getAll);
+
 app.post("/login", passport.authenticate("local"), AuthController.getMe);
 
 app.post("/register", AuthController.register);
+
+app.post("/block", passport.authenticate("jwt"), UserController.block);
+
+app.post("/unblock", passport.authenticate("jwt"), UserController.unblock);
+
+app.post("/delete", passport.authenticate("jwt"), UserController.delete);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

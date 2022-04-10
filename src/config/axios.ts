@@ -1,7 +1,15 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
-const Axios = axios.create({
-  baseURL: "http://localhost:3001",
-});
+const AxiosInstance = () => {
+  const token = Cookies.get("token");
+  const Axios = axios.create({
+    baseURL: "http://localhost:3001",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
+  return Axios;
+};
 
-export default Axios;
+export default AxiosInstance;
