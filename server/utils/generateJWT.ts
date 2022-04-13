@@ -9,7 +9,7 @@ export default (user: UserData): string => {
     },
     process.env.JWT_SECRET_KEY || "",
     {
-      expiresIn: process.env.JWT_MAX_AGE,
+      expiresIn: process.env.JWT_MAX_AGE!,
       algorithm: "HS256",
     }
   );
