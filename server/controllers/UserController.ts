@@ -1,11 +1,10 @@
 import express from "express";
 import { Op } from "sequelize";
-import { IUserRequest } from "../types";
 
 const { User } = require("../../models");
 
-const blockUsers = async (users, toBlock) => {
-  const userIds = users.map((user) => user.id);
+const blockUsers = async (users: any, toBlock: number) => {
+  const userIds = users.map((user: any) => user.id);
   await User.update(
     {
       status: toBlock,
@@ -63,7 +62,7 @@ class UserController {
   async delete(req: express.Request, res: express.Response) {
     if (req.user) {
       try {
-        const userIds = req.body.users.map((user) => user.id);
+        const userIds = req.body.users.map((user: any) => user.id);
         await User.destroy({
           where: {
             id: {
@@ -85,7 +84,7 @@ class UserController {
       try {
         const user = await User.findOne({
           where: {
-            id: req.user.data.id,
+            id: (req.user as any).data.id,
           },
         });
         res.send({ status: "OK", user });
