@@ -6,7 +6,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import styled from "styled-components";
 import { useAppDispatch } from "../redux/hooks";
 import { setUserInfo } from "../redux/userSlice";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 
 const Background = styled.div`
   background-image: url("/background.jpeg");
@@ -22,8 +22,6 @@ export type AuthFragment = {
 };
 
 const Auth = () => {
-  const params = useParams();
-  console.log(params);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [activeFragment, setActiveFragment] = React.useState<
