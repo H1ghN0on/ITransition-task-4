@@ -1,6 +1,6 @@
 import express from "express";
 import generateJWT from "../utils/generateJWT";
-import { IUserRequest } from "../types";
+
 const { User } = require("../../models");
 
 export type UserData = {
@@ -103,7 +103,11 @@ class AuthController {
     }
   }
 
-  async loginForPassport(login_username: string, login_password: string, done) {
+  async loginForPassport(
+    login_username: string,
+    login_password: string,
+    done: any
+  ) {
     let dbUser = await User.findOne({
       where: {
         username: login_username,
